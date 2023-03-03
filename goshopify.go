@@ -268,6 +268,16 @@ func (c *Client) Do(req *http.Request, v interface{}) error {
 		if err != nil {
 			return err
 		}
+
+		links := resp.Header["Link"]
+		productResource, ok := v.(*ProductsResource)
+		if ok && len(links) > 0 {
+			var pageInfoRE = regexp.MustCompile(`page_info=([^>]+)>; rel="next"`)
+			s := pageInfoRE.FindAllStringSubmatch(links[0], -1)
+			if len(s) > 0 && len(s[0]) > 0 {
+				productResource.PageInfo = s[0][1]
+			}
+		}
 	}
 
 	return nil

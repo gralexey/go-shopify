@@ -12,7 +12,7 @@ const productsResourceName = "products"
 // of the Shopify API.
 // See: https://help.shopify.com/api/reference/product
 type ProductService interface {
-	List(interface{}) ([]Product, error)
+	List(interface{}) (*ProductsResource, error)
 	Count(interface{}) (int, error)
 	Get(int64, interface{}) (*Product, error)
 	Create(Product) (*Product, error)
@@ -70,14 +70,15 @@ type ProductResource struct {
 // Represents the result from the products.json endpoint
 type ProductsResource struct {
 	Products []Product `json:"products"`
+	PageInfo string
 }
 
 // List products
-func (s *ProductServiceOp) List(options interface{}) ([]Product, error) {
+func (s *ProductServiceOp) List(options interface{}) (*ProductsResource, error) {
 	path := fmt.Sprintf("%s/%s.json", globalApiPathPrefix, productsBasePath)
 	resource := new(ProductsResource)
 	err := s.client.Get(path, resource, options)
-	return resource.Products, err
+	return resource, err
 }
 
 // Count products
